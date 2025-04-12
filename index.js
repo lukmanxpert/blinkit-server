@@ -32,8 +32,7 @@ app.get("/", (req, res) => {
   });
 });
 
-connectDb().then(() => {
-  app.listen(port, () => {
-    console.log("Server is running at port", port);
-  });
+app.listen(port, async () => {
+  console.log("Server is running at port", port);
+  await connectDb();
 });
