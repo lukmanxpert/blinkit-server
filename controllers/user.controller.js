@@ -184,29 +184,63 @@ export async function logOutController(req, res) {
 }
 
 // upload user avatar
-export async function uploadAvatar(req, res){
+export async function uploadAvatar(req, res) {
   try {
-    const userId = req.userId // auth middleware
+    const userId = req.userId; // auth middleware
     const image = req.file; // multer middleware
 
-    const upload = await uploadImageCloudinary(image)
+    const upload = await uploadImageCloudinary(image);
 
     const updateUser = await userModel.findByIdAndUpdate(userId, {
-      avatar: upload.url
-    })
+      avatar: upload.url,
+    });
 
     return res.json({
       message: "upload profile",
       data: {
         _id: userId,
-        avatar: upload.url
-      }
-    })
+        avatar: upload.url,
+      },
+    });
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
       error: true,
-      success: false
-    })
+      success: false,
+    });
+  }
+}
+
+// update users details
+export async function updateUserDetails(req, res) {
+  try {
+    const userId = req.userId; // auth middleware
+    const { name, email, mobile, password } = req.body;
+    let hashPassword = "";
+    if (password) {
+      const salt = await bcryptjs.genSalt(10);
+      hashPassword = await bcryptjs.hash(password, salt);
+    }
+    const updateUser = await userModel.updateOne(
+      { _id: userId },
+      {
+        ...(name && { name: name }),
+        ...(email && { email: email }),
+        ...(mobile && { mobile: mobile }),
+        ...(password && { password: hashPassword }),
+      }
+    );
+    return res.json({
+      message: "Updated user successfully",
+      error: false,
+      success: true,
+      data: updateUser,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 }
