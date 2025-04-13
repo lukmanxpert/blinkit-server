@@ -5,6 +5,7 @@ import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
 import dotenv from "dotenv";
 import generateAccessToken from "../utils/generateAccessToken.js";
 import generateRefreshToken from "../utils/generateRefreshToken.js";
+import uploadImageCloudinary from "../utils/uploadImageCloudinary.js";
 dotenv.config();
 
 export async function registerUserController(req, res) {
@@ -157,7 +158,7 @@ export async function loginController(req, res) {
 // logout controller
 export async function logOutController(req, res) {
   try {
-    const userId = req.userId
+    const userId = req.userId;
     const cookiesOption = {
       httpOnly: true,
       secure: true,
@@ -166,8 +167,8 @@ export async function logOutController(req, res) {
     res.clearCookie("accessToken", cookiesOption);
     res.clearCookie("refreshToken", cookiesOption);
     const removeRefreshToken = await userModel.findByIdAndUpdate(userId, {
-      refresh_token: ""
-    })
+      refresh_token: "",
+    });
     return res.json({
       message: "Logout successfully",
       error: false,
@@ -179,5 +180,33 @@ export async function logOutController(req, res) {
       error: true,
       success: false,
     });
+  }
+}
+
+// upload user avatar
+export async function uploadAvatar(req, res){
+  try {
+    const userId = req.userId // auth middleware
+    const image = req.file; // multer middleware
+
+    const upload = await uploadImageCloudinary(image)
+
+    const updateUser = await userModel.findByIdAndUpdate(userId, {
+      avatar: upload.url
+    })
+
+    return res.json({
+      message: "upload profile",
+      data: {
+        _id: userId,
+        avatar: upload.url
+      }
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false
+    })
   }
 }
