@@ -100,8 +100,8 @@ export async function loginController(req, res) {
       return res.status(400).json({
         message: "Provide the valid email and password",
         error: true,
-        success: false
-      })
+        success: false,
+      });
     }
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -147,6 +147,30 @@ export async function loginController(req, res) {
     });
   } catch (error) {
     res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+// logout controller
+export async function logOutController(req, res) {
+  try {
+    const cookiesOption = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+    res.clearCookie("accessToken", cookiesOption);
+    res.clearCookie("refreshToken", cookiesOption);
+    return res.json({
+      message: "Logout successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
       message: error.message || error,
       error: true,
       success: false,
