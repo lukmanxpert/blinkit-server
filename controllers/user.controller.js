@@ -9,6 +9,7 @@ import uploadImageCloudinary from "../utils/uploadImageCloudinary.js";
 import generateOtp from "../utils/generateOpt.js";
 import forgotPasswordTemplate from "../utils/forgotPasswordTemplate.js";
 dotenv.config();
+import jwt from "jsonwebtoken";
 
 export async function registerUserController(req, res) {
   try {
@@ -383,6 +384,60 @@ export async function resetPassword(req, res) {
       error: false,
       success: true,
     });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
+
+// refresh token controller
+export async function refreshTokenController(req, res) {
+  try {
+    const refreshToken =
+      req.cookies.refreshToken || req?.header?.authorization?.split(" ")[1];
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: "Invalid token",
+        error: true,
+        success: false,
+      });
+    }
+    console.log("refresh token", refreshToken);
+
+    const verifyToken = await jwt.verify(
+      refreshToken,
+      process.env.SECRET_KEY_REFRESH_TOKEN
+    );
+
+    if (!verifyToken) {
+      return res.status(401).json({
+        message: "Token is expired",
+        error: true,
+        success: false,
+      });
+    }
+
+    const userId = verifyToken?.id;
+    const newAccessToken = await generateAccessToken(userId);
+
+    const cookiesOption = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+    return res.json({
+      message: "New access token generated",
+      error: false,
+      success: true,
+      data: {
+        accessToken: newAccessToken,
+      },
+    });
+    res.cookie("accessToken", newAccessToken, cookiesOption);
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
