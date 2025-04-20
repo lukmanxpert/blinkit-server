@@ -13,14 +13,14 @@ import jwt from "jsonwebtoken";
 
 export async function registerUserController(req, res) {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
+    if (!req.body || !req.body.name || !req.body.email || !req.body.password) {
       return res.status(400).json({
         message: "Provide the name, email & password",
         error: true,
         success: false,
       });
     }
+    const { name, email, password } = req.body;
 
     const user = await userModel.findOne({ email });
     if (user) {
