@@ -5,7 +5,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from "helmet";
 import connectDb from "./config/connectDb.js";
-import userRouter from "./route/user.route.js";
+import userRouter from "./routes/user.route.js";
+import categoryRouter from "./routes/category.route.js";
 
 dotenv.config();
 const app = express();
@@ -33,7 +34,8 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/api/user", userRouter)
+app.use("/api/user", userRouter);
+app.use("/api/category", categoryRouter);
 
 app.listen(port, async () => {
   console.log("Server is running at port", port);
