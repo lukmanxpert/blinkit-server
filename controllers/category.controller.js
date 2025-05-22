@@ -2,7 +2,6 @@ import categoryModel from "../models/category.model.js";
 
 export const addCategoryController = async (req, res) => {
   try {
-    
     const { name, image } = req.body;
     if (!name || !image) {
       return res.status.json({
@@ -33,14 +32,28 @@ export const addCategoryController = async (req, res) => {
       success: true,
       error: false,
     });
-
   } catch (error) {
-
     res.status(500).json({
       message: error.message || error,
       error: true,
       success: false,
     });
+  }
+};
 
+export const getCategoryController = async (req, res) => {
+  try {
+    const data = await categoryModel.find();
+    res.json({
+      data: data,
+      success: true,
+      error: false,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
   }
 };
