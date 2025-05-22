@@ -47,7 +47,7 @@ export const addCategoryController = async (req, res) => {
 // get category controller
 export const getCategoryController = async (req, res) => {
   try {
-    const data = await categoryModel.find();
+    const data = await categoryModel.find().sort({ createdAt: -1 });
     res.json({
       data: data,
       success: true,
