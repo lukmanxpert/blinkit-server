@@ -18,7 +18,7 @@ export const addSubCategoryController = async (req, res) => {
     const createSubCategoryData = new subCategoryModel(payload);
     const save = await createSubCategoryData.save();
     return res.json({
-      message: "Save Sub Category",
+      message: "Saved Sub Category",
       success: true,
       error: false,
       data: save,
@@ -28,6 +28,24 @@ export const addSubCategoryController = async (req, res) => {
       message: error.message || error,
       success: false,
       error: true,
+    });
+  }
+};
+
+export const getSubCategoryController = async (req, res) => {
+  try {
+    const data = await subCategoryModel.find().sort({ createdAt: -1 });
+    return res.json({
+      message: "Sub category data",
+      data,
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      success: true,
+      error: false,
     });
   }
 };
