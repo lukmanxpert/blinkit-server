@@ -34,7 +34,10 @@ export const addSubCategoryController = async (req, res) => {
 
 export const getSubCategoryController = async (req, res) => {
   try {
-    const data = await subCategoryModel.find().sort({ createdAt: -1 }).populate("category")
+    const data = await subCategoryModel
+      .find()
+      .sort({ createdAt: -1 })
+      .populate("category");
     return res.json({
       message: "Sub category data",
       data,
@@ -46,6 +49,40 @@ export const getSubCategoryController = async (req, res) => {
       message: error.message || error,
       success: true,
       error: false,
+    });
+  }
+};
+
+export const updateSubCategoryController = async (req, res) => {
+  try {
+    const { _id, name, image, category } = req.body;
+    const isExist = await subCategoryModel.findById(_id);
+    if (!isExist) {
+      return res.status(400).json({
+        message: "Items not found!",
+        error: true,
+        success: false,
+      });
+    }
+    const updatedData = await subCategoryModel.updateOne(
+      { _id },
+      {
+        name,
+        image,
+        category,
+      }
+    );
+    return res.json({
+      message: "Updated successfully!",
+      success: true,
+      error: false,
+      data: updatedData,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      success: false,
+      error: true,
     });
   }
 };
