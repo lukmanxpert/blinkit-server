@@ -226,3 +226,30 @@ export const updateProductDetails = async (req, res) => {
     });
   }
 };
+
+// delete products
+export const deleteProductDetails = async (req, res) => {
+  try {
+    const { _id } = req.body;
+    if (!_id) {
+      return res.status(400).json({
+        message: "Provide the ID",
+        error: true,
+        success: false,
+      });
+    }
+    const deleteResult = await productModel.deleteOne({ _id });
+    return res.json({
+      message: "Delete Successfully",
+      error: false,
+      success: true,
+      data: deleteResult,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error || "Something went wrong",
+      success: false,
+      error: true,
+    });
+  }
+};
