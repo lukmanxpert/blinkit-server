@@ -257,7 +257,7 @@ export const deleteProductDetails = async (req, res) => {
 // search products
 export const searchProducts = async (req, res) => {
   try {
-    const { search, page, limit } = req.body;
+    let { search, page, limit } = req.body;
     if (!page) {
       page = 1;
     }
@@ -278,7 +278,7 @@ export const searchProducts = async (req, res) => {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("category, subCategory"),
+        .populate("category subCategory"),
       productModel.countDocuments(query),
     ]);
     return res.json({
@@ -287,6 +287,9 @@ export const searchProducts = async (req, res) => {
       error: false,
       data: data,
       totalCount: dataCount,
+      totalPage: Math.ceil(dataCount / limit),
+      page: page,
+      limit: limit,
     });
   } catch (error) {
     return res.status(500).json({
