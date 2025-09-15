@@ -1,5 +1,5 @@
-import cartProductModel from "../models/cartProduct.model";
-import userModel from "../models/user.model";
+import cartProductModel from "../models/cartProduct.model.js";
+import userModel from "../models/user.model.js";
 
 export const addToCartItemController = async (req, res) => {
   try {
@@ -44,6 +44,28 @@ export const addToCartItemController = async (req, res) => {
     return res.json({
       data: save,
       message: "Item add successfully",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+export const getCartItemController = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const cartItem = await cartProductModel.find({
+      userId: userId,
+    }).populate("productId");
+
+    return res.json({
+      data: cartItem,
       error: false,
       success: true,
     });
