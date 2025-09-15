@@ -43,6 +43,7 @@ app.use("/api/category", categoryRouter);
 app.use("/api/file", uploadRouter);
 app.use("/api/subCategory", subCategoryRouter);
 app.use("/api/product", productRouter);
+app.use("/api/cart", cartRouter);
 
 app.listen(port, async () => {
   console.log("Server is running at port", port);
