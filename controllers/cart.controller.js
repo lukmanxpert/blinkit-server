@@ -60,14 +60,52 @@ export const getCartItemController = async (req, res) => {
   try {
     const userId = req.userId;
 
-    const cartItem = await cartProductModel.find({
-      userId: userId,
-    }).populate("productId");
+    const cartItem = await cartProductModel
+      .find({
+        userId: userId,
+      })
+      .populate("productId");
 
     return res.json({
       data: cartItem,
       error: false,
       success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
+
+export const updateCartItemQuantityController = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { _id, quantity } = req.body;
+
+    if (!_id || !quantity) {
+      return res.status(400).json({
+        message: "provide _id, quantity",
+      });
+    }
+
+    const updateCartItem = await cartProductModel.updateOne(
+      {
+        _id: _id,
+        userId: userId,
+      },
+      {
+        quantity: quantity,
+      }
+    );
+
+    return res.json({
+      message: "Item Added",
+      success: true,
+      error: false,
+      data: updateCartItem,
     });
   } catch (error) {
     return res.status(500).json({
