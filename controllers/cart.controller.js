@@ -115,3 +115,34 @@ export const updateCartItemQuantityController = async (req, res) => {
     });
   }
 };
+
+export const deleteCartItemQuantityController = async(req,res)=>{
+    try {
+      const userId = req.userId // middleware
+      const { _id } = req.body 
+      
+      if(!_id){
+        return res.status(400).json({
+            message : "Provide _id",
+            error : true,
+            success : false
+        })
+      }
+
+      const deleteCartItem  = await cartProductModel.deleteOne({_id : _id, userId : userId })
+
+      return res.json({
+        message : "Item removed",
+        error : false,
+        success : true,
+        data : deleteCartItem
+      })
+
+    } catch (error) {
+        return res.status(500).json({
+            message : error.message || error,
+            error : true,
+            success : false
+        })
+    }
+}
