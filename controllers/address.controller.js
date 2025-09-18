@@ -60,3 +60,36 @@ export const getAddressController = async (req, res) => {
     });
   }
 };
+
+export const updateAddressController = async (req, res) => {
+  try {
+    const userId = req.userId; // middleware auth
+    const { _id, address_line, city, state, country, pincode, mobile } =
+      req.body;
+
+    const updateAddress = await addressModel.updateOne(
+      { _id: _id, userId: userId },
+      {
+        address_line,
+        city,
+        state,
+        country,
+        mobile,
+        pincode,
+      }
+    );
+
+    return res.json({
+      message: "Address Updated",
+      error: false,
+      success: true,
+      data: updateAddress,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};

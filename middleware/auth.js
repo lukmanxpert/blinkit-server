@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
     console.log("token", token);
     if (!token) {
       return res.status(401).json({
-        message: "Provide the token",
+        message: "Login First",
         error: true,
         success: false,
       });
