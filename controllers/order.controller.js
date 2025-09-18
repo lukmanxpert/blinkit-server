@@ -113,3 +113,81 @@ export async function paymentController(req, res) {
     });
   }
 }
+
+const getOrderProductItems = async ({
+  lineItems,
+  userId,
+  addressId,
+  paymentId,
+  payment_status,
+}) => {
+  const productList = [];
+
+  if (lineItems?.data?.length) {
+    for (const item of lineItems.data) {
+      const product = await Stripe.products.retrieve(item.price.product);
+
+      const payload = {
+        userId: userId,
+        orderId: `ORD-${new mongoose.Types.ObjectId()}`,
+        productId: product.metadata.productId,
+        product_details: {
+          name: product.name,
+          image: product.images,
+        },
+        paymentId: paymentId,
+        payment_status: payment_status,
+        delivery_address: addressId,
+        subTotalAmt: Number(item.amount_total / 100),
+        totalAmt: Number(item.amount_total / 100),
+      };
+
+      productList.push(payload);
+    }
+  }
+
+  return productList;
+};
+
+// http://localhost:9000/api/order/webhook
+export async function webhookStripe(req, res) {
+  const event = req.body;
+  const endPointSecret = process.env.STRIPE_ENDPOINT_WEBHOOK_SECRET_KEY;
+
+  console.log("event", event);
+
+  // Handle the event
+  switch (event.type) {
+    case "checkout.session.completed":
+      const session = event.data.object;
+      const lineItems = await Stripe.checkout.sessions.listLineItems(
+        session.id
+      );
+      const userId = session.metadata.userId;
+      const orderProduct = await getOrderProductItems({
+        lineItems: lineItems,
+        userId: userId,
+        addressId: session.metadata.addressId,
+        paymentId: session.payment_intent,
+        payment_status: session.payment_status,
+      });
+
+      const order = await orderModel.insertMany(orderProduct);
+
+      console.log(order);
+      if (Boolean(order[0])) {
+        const removeCartItems = await userModel.findByIdAndUpdate(userId, {
+          shopping_cart: [],
+        });
+        const removeCartProductDB = await cartProductModel.deleteMany({
+          userId: userId,
+        });
+      }
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  response.json({ received: true });
+}
