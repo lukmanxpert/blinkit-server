@@ -37,3 +37,26 @@ export const addAddressController = async (req, res) => {
     });
   }
 };
+
+export const getAddressController = async (req, res) => {
+  try {
+    const userId = req.userId; // middleware auth
+
+    const data = await addressModel.find({ userId: userId }).sort({
+      createdAt: -1,
+    });
+
+    return res.json({
+      data: data,
+      message: "List of address",
+      error: false,
+      success: true,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
