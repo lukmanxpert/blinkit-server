@@ -51,13 +51,13 @@ app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/order", orderRouter);
 
-// app.listen(port, async () => {
-//   console.log("Server is running at port", port);
-//   await connectDb();
-// });
+app.listen(port, async () => {
+  console.log("Server is running at port", port);
+  await connectDb();
+});
 
-// Connect DB once
-connectDb();
+// // Connect DB once
+// connectDb();
 
-// Export for Vercel
-export const handler = serverless(app);
+// // Export for Vercel
+// export const handler = serverless(app);
