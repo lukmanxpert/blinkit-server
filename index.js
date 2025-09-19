@@ -50,12 +50,12 @@ app.use("/api/cart", cartRouter);
 app.use("/api/address", addressRouter);
 app.use("/api/order", orderRouter);
 
-app.listen(port, async () => {
-  console.log("Server is running at port", port);
-  await connectDb();
-});
+// app.listen(port, async () => {
+//   console.log("Server is running at port", port);
+//   await connectDb();
+// });
 
-// // Initialize database connection
-// connectDb().catch((err) => console.error("Database connection error:", err));
+// Initialize database connection
+connectDb().catch((err) => console.error("Database connection error:", err));
 
-// export default app;
+export default app;
